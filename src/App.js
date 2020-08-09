@@ -11,25 +11,44 @@ const App = () => {
 
   //State
   const [recipes, setRecipes] = useState([]);
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
 
   // Call Api
   useEffect(() => {
     getRecipes();
-  });
+  }, [query]);
 
   // Function whitch call the Api
   const getRecipes = async () => {
     const response = await fetch(
-      `https://api.edamam.com/search?q=chicken&app_id=${apiId}&app_key=${apiKey}`
+      `https://api.edamam.com/search?q=${query}&app_id=${apiId}&app_key=${apiKey}`
     );
     const data = await response.json();
     setRecipes(data.hits);
+    // console.log(data.hits);
+  };
+
+  //change State with the Query input
+  const handleChange = (e) => {
+    setSearch(e.target.value);
+  };
+  // On submit, the app call the api only on submit !
+  const getSearch = (e) => {
+    e.preventDefault();
+    setQuery(search);
+    setSearch("");
   };
 
   return (
     <div className="App">
-      <form className="search-form">
-        <input className="search-bar" type="text" />
+      <form className="search-form" onSubmit={getSearch}>
+        <input
+          className="search-bar"
+          type="text"
+          value={search}
+          onChange={handleChange}
+        />
         <button className="search-button" type="submit">
           Rechercher
         </button>
@@ -40,6 +59,7 @@ const App = () => {
           title={recipe.recipe.label}
           calories={Math.round(recipe.recipe.calories)}
           photo={recipe.recipe.image}
+          ingredients={recipe.recipe.ingredients}
         />
       ))}
     </div>
